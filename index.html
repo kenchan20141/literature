@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文學人典藏錄 &bull; Archivum Litterarum</title>
+  
+  <!-- 字型加載：古典羅馬字體 Cinzel、古典襯線 Cormorant 與 思源宋體 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Serif+TC:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-parchment: #F5EFEB;
+      --gold-primary: #C5A059;
+      --gold-light: #E8D39E;
+      --gold-dark: #8C6D37;
+      --ink-primary: #1A1412;
+      --ink-light: #4A3E37;
+      --ink-faint: #7D6F66;
+      --border-gold: rgba(197, 160, 89, 0.45);
+      --transition-smooth: cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-parchment);
+      color: var(--ink-primary);
+      font-family: 'Noto Serif TC', 'Cormorant Garamond', serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* 羊皮紙底紋漸層 */
+    .parchment-layer {
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(ellipse at 50% 40%, rgba(255, 253, 248, 0.7) 0%, rgba(240, 230, 214, 0.8) 60%, rgba(215, 196, 170, 0.95) 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* 紙質顆粒紋理 */
+    .paper-noise {
+      position: fixed;
+      inset: 0;
+      opacity: 0.28;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* 金粉光斑 Canvas */
+    #goldDustCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* 古典金色外框 */
+    .antique-frame {
+      position: fixed;
+      inset: 14px;
+      border: 1px solid var(--border-gold);
+      pointer-events: none;
+      z-index: 10;
+    }
+    .antique-frame-inner {
+      position: absolute;
+      inset: 4px;
+      border: 1px solid rgba(197, 160, 89, 0.2);
+    }
+
+    /* 四角復古花飾 (純向量 SVG) */
+    .corner-flourish {
+      position: absolute;
+      width: 64px;
+      height: 64px;
+      fill: none;
+      stroke: var(--gold-primary);
+      stroke-width: 1.5;
+    }
+    .top-left { top: -2px; left: -2px; }
+    .top-right { top: -2px; right: -2px; transform: scaleX(-1); }
+    .bottom-left { bottom: -2px; left: -2px; transform: scaleY(-1); }
+    .bottom-right { bottom: -2px; right: -2px; transform: scale(-1); }
+
+    /* 主舞台版面 */
+    .viewport-container {
+      position: relative;
+      z-index: 5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 30px 24px 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-top: 10px;
+    }
+    .main-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(20px, 3.2vw, 36px);
+      letter-spacing: 0.3em;
+      color: var(--gold-dark);
+      text-transform: uppercase;
+      font-weight: 700;
+      text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+    }
+    .sub-title {
+      font-size: clamp(12px, 1.2vw, 14px);
+      letter-spacing: 0.45em;
+      color: var(--ink-faint);
+      margin-top: 4px;
+    }
+
+    /* 角色展示廊 (Hero Stage) */
+    .characters-stage {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(10px, 1.8vw, 22px);
+      padding: 16px 0;
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* 角色卡片 (全身無裁切黃金比例) */
+    .char-card {
+      position: relative;
+      flex: 1;
+      max-width: 215px;
+      height: clamp(480px, 72vh, 620px);
+      background: linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(235,223,205,0.45) 100%);
+      border: 1px solid var(--border-gold);
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 16px 10px;
+      transition: transform 0.5s var(--transition-smooth), box-shadow 0.5s var(--transition-smooth), border-color 0.4s;
+      overflow: hidden;
+    }
+
+    .char-card::before {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border: 1px solid rgba(197, 160, 89, 0.2);
+      border-radius: 2px;
+      pointer-events: none;
+    }
+
+    .char-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--gold-primary);
+      box-shadow: 0 16px 36px rgba(140, 109, 55, 0.2), 0 0 16px rgba(232, 211, 158, 0.4);
+    }
+
+    /* 角色影像：垂直錨點固定居中 50%，完整顯示全身 */
+    .char-visual {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 84%;
+      background-image: url('文學人.JPG');
+      background-repeat: no-repeat;
+      background-size: 615% auto;
+      background-position-y: 50% !important;
+      transition: transform 0.6s var(--transition-smooth), filter 0.4s;
+      filter: sepia(0.08) contrast(1.02);
+    }
+
+    /* 6 位角色精準水平定位 */
+    .char-card[data-index="0"] .char-visual { background-position-x: 7.5%; }
+    .char-card[data-index="1"] .char-visual { background-position-x: 25.5%; }
+    .char-card[data-index="2"] .char-visual { background-position-x: 43%; }
+    .char-card[data-index="3"] .char-visual { background-position-x: 59%; }
+    .char-card[data-index="4"] .char-visual { background-position-x: 76.5%; }
+    .char-card[data-index="5"] .char-visual { background-position-x: 94.5%; }
+
+    .char-card:hover .char-visual {
+      transform: scale(1.04);
+      filter: sepia(0) contrast(1.05);
+    }
+
+    .char-gradient-scrim {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(238, 226, 209, 0.96) 16%, rgba(238, 226, 209, 0.2) 36%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* 角色底部文字資訊 */
+    .char-meta {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+    .char-numeral {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 0.25em;
+      color: var(--gold-dark);
+      display: block;
+      margin-bottom: 3px;
+    }
+    .char-name {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      color: var(--ink-primary);
+      margin-bottom: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .char-name.is-empty {
+      color: var(--ink-faint);
+      font-style: italic;
+      font-weight: 400;
+      font-size: 13px;
+    }
+    .char-tag {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: var(--ink-faint);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    footer {
+      text-align: center;
+      padding-bottom: 6px;
+    }
+    .enter-cue {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 0.4em;
+      color: var(--gold-dark);
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    /* ========================================================
+       個人作品集 手稿視窗 (唯讀閱覽模式)
+       ======================================================== */
+    .portfolio-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(28, 22, 18, 0.65);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+      padding: 20px;
+    }
+    .portfolio-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .manuscript-book {
+      position: relative;
+      width: 100%;
+      max-width: 980px;
+      height: 88vh;
+      background: var(--bg-parchment);
+      border: 1px solid var(--gold-primary);
+      border-radius: 4px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.4), inset 0 0 80px rgba(220, 200, 170, 0.4);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: scale(0.96) translateY(15px);
+      transition: transform 0.5s var(--transition-smooth);
+    }
+    .portfolio-overlay.active .manuscript-book {
+      transform: scale(1) translateY(0);
+    }
+
+    .book-flourish {
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      fill: none;
+      stroke: var(--gold-primary);
+      stroke-width: 1.2;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* 手稿頂部資訊列 */
+    .book-header {
+      padding: 24px 36px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-gold);
+      position: relative;
+      background: rgba(255,255,255,0.25);
+    }
+    .book-author-info {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .book-author-name {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      color: var(--ink-primary);
+    }
+    .book-author-genre {
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      color: var(--gold-dark);
+      font-style: italic;
+    }
+
+    .btn-close {
+      background: transparent;
+      border: 1px solid var(--border-gold);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      stroke: var(--ink-primary);
+      transition: all 0.3s;
+    }
+    .btn-close:hover {
+      border-color: var(--gold-dark);
+      background: rgba(197, 160, 89, 0.15);
+      stroke: var(--gold-dark);
+      transform: rotate(90deg);
+    }
+
+    /* 體裁導航：詩歌 / 小說 / 散文 */
+    .genre-nav {
+      display: flex;
+      padding: 0 36px;
+      background: rgba(230, 218, 200, 0.3);
+      border-bottom: 1px solid var(--border-gold);
+    }
+    .genre-tab {
+      padding: 14px 28px;
+      font-size: 15px;
+      letter-spacing: 0.3em;
+      color: var(--ink-light);
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.3s;
+    }
+    .genre-tab:hover {
+      color: var(--ink-primary);
+    }
+    .genre-tab.active {
+      color: var(--gold-dark);
+      border-bottom-color: var(--gold-dark);
+      font-weight: 600;
+    }
+
+    /* 作品陳列主體 */
+    .book-body {
+      flex: 1;
+      padding: 30px 36px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--gold-primary) transparent;
+      position: relative;
+    }
+
+    /* 空作品狀態 */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 240px;
+      text-align: center;
+      gap: 16px;
+    }
+    .empty-symbol {
+      width: 36px;
+      height: 1px;
+      background: var(--gold-primary);
+      opacity: 0.6;
+    }
+    .empty-text {
+      font-size: 14px;
+      letter-spacing: 0.35em;
+      color: var(--ink-faint);
+      font-style: italic;
+    }
+
+    .works-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+    }
+
+    .work-item {
+      background: rgba(255, 255, 255, 0.55);
+      border: 1px solid rgba(197, 160, 89, 0.28);
+      border-radius: 3px;
+      padding: 22px 20px;
+      cursor: pointer;
+      transition: all 0.4s var(--transition-smooth);
+      position: relative;
+    }
+    .work-item::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 3px;
+      height: 0%;
+      background: var(--gold-primary);
+      transition: height 0.35s ease;
+    }
+    .work-item:hover {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: var(--gold-primary);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(140, 109, 55, 0.08);
+    }
+    .work-item:hover::after {
+      height: 100%;
+    }
+
+    .work-title {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      color: var(--ink-primary);
+      margin-bottom: 6px;
+    }
+    .work-tagline {
+      font-size: 12px;
+      color: var(--gold-dark);
+      letter-spacing: 0.18em;
+      margin-bottom: 12px;
+    }
+    .work-excerpt {
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--ink-light);
+      text-align: justify;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* 單篇手稿全覽視圖 */
+    .manuscript-reader {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+    .manuscript-reader.active {
+      display: block;
+    }
+    .reader-back {
+      font-size: 12px;
+      letter-spacing: 0.2em;
+      color: var(--gold-dark);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 20px;
+      border: none;
+      background: none;
+      font-family: inherit;
+    }
+    .reader-back:hover {
+      text-decoration: underline;
+    }
+    .reader-title {
+      font-size: 24px;
+      letter-spacing: 0.2em;
+      color: var(--ink-primary);
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .reader-subtitle {
+      font-size: 12px;
+      letter-spacing: 0.3em;
+      text-align: center;
+      color: var(--gold-dark);
+      margin-bottom: 30px;
+    }
+    .reader-content {
+      max-width: 640px;
+      margin: 0 auto;
+      font-size: 15px;
+      line-height: 2.3;
+      color: var(--ink-light);
+      text-align: justify;
+      white-space: pre-line;
+      padding: 0 10px;
+    }
+    .reader-content::first-letter {
+      float: left;
+      font-size: 40px;
+      line-height: 1;
+      padding-right: 12px;
+      font-family: 'Cinzel', serif;
+      color: var(--gold-dark);
+      font-weight: 700;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 響應式優化 */
+    @media (max-width: 860px) {
+      .characters-stage {
+        overflow-x: auto;
+        justify-content: flex-start;
+        padding: 20px 10px;
+        scroll-snap-type: x mandatory;
+      }
+      .char-card {
+        flex: 0 0 205px;
+        height: 480px;
+        scroll-snap-align: center;
+      }
+      .book-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .btn-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+      }
+      .genre-nav {
+        padding: 0 16px;
+      }
+      .genre-tab {
+        padding: 12px 16px;
+        font-size: 14px;
+      }
+      .book-body {
+        padding: 20px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="parchment-layer"></div>
+  <div class="paper-noise"></div>
+  <canvas id="goldDustCanvas"></canvas>
+
+  <!-- 金色外框與四角飾紋 -->
+  <div class="antique-frame">
+    <div class="antique-frame-inner"></div>
+    <svg class="corner-flourish top-left" viewBox="0 0 100 100"><path d="M4 96 V 24 C 4 12, 12 4, 24 4 H 96 M12 96 V 30 C 12 20, 20 12, 30 12 H 96"/><circle cx="28" cy="28" r="4" fill="var(--gold-primary)"/></svg>
+    <svg class="corner-flourish top-right" viewBox="0 0 100 100"><path d="M4 96 V 24 C 4 12, 12 4, 24 4 H 96 M12 96 V 30 C 12 20, 20 12, 30 12 H 96"/><circle cx="28" cy="28" r="4" fill="var(--gold-primary)"/></svg>
+    <svg class="corner-flourish bottom-left" viewBox="0 0 100 100"><path d="M4 96 V 24 C 4 12, 12 4, 24 4 H 96 M12 96 V 30 C 12 20, 20 12, 30 12 H 96"/><circle cx="28" cy="28" r="4" fill="var(--gold-primary)"/></svg>
+    <svg class="corner-flourish bottom-right" viewBox="0 0 100 100"><path d="M4 96 V 24 C 4 12, 12 4, 24 4 H 96 M12 96 V 30 C 12 20, 20 12, 30 12 H 96"/><circle cx="28" cy="28" r="4" fill="var(--gold-primary)"/></svg>
+  </div>
+
+  <div class="viewport-container">
+    <header>
+      <h1 class="main-title">Archivum Litterarum</h1>
+      <p class="sub-title">文 學 人 典 藏 冊</p>
+    </header>
+
+    <!-- 6 位學生角色主舞台 -->
+    <main class="characters-stage" id="charactersStage"></main>
+
+    <footer>
+      <p class="enter-cue">&mdash; 點 擊 卷 冊 閱 讀 創 作 &mdash;</p>
+    </footer>
+  </div>
+
+  <!-- 個人手稿典藏視窗 (純讀取) -->
+  <div class="portfolio-overlay" id="portfolioOverlay">
+    <div class="manuscript-book">
+      <svg class="book-flourish top-left" viewBox="0 0 60 60"><path d="M2 58 V16 A14 14 0 0 1 16 2 H58"/></svg>
+      <svg class="book-flourish top-right" viewBox="0 0 60 60" style="transform: scaleX(-1);"><path d="M2 58 V16 A14 14 0 0 1 16 2 H58"/></svg>
+
+      <!-- 作者資訊 -->
+      <div class="book-header">
+        <div class="book-author-info">
+          <h2 class="book-author-name" id="modalAuthorName">學生姓名</h2>
+          <span class="book-author-genre" id="modalAuthorGenre">文學方向</span>
+        </div>
+        <button class="btn-close" id="btnCloseModal" title="闔上手稿">
+          <svg width="14" height="14" viewBox="0 0 14 14" stroke-width="1.8">
+            <line x1="1" y1="1" x2="13" y2="13" />
+            <line x1="13" y1="1" x2="1" y2="13" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- 分類導航 -->
+      <nav class="genre-nav">
+        <button class="genre-tab active" data-genre="poetry">詩 歌</button>
+        <button class="genre-tab" data-genre="novel">小 說</button>
+        <button class="genre-tab" data-genre="prose">散 文</button>
+      </nav>
+
+      <!-- 篇目內容展示區 -->
+      <div class="book-body">
+        <div id="worksListContainer">
+          <div class="works-grid" id="worksGrid"></div>
+        </div>
+
+        <!-- 篇目全篇閱讀視圖 -->
+        <div class="manuscript-reader" id="manuscriptReader">
+          <button class="reader-back" id="btnReaderBack">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M8 2 L4 6 L8 10"/>
+            </svg>
+            返 回 篇 目
+          </button>
+          <h3 class="reader-title" id="readerTitle">篇目名</h3>
+          <p class="reader-subtitle" id="readerSubtitle">體裁與題註</p>
+          <div class="reader-content" id="readerContent"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       【學生資料與作品典藏設定區】
+       您只需直接在下方代碼中修訂 6 位學生的姓名 (name)、簡介 (tag)，
+       以及其各自在 poetry（詩歌）、novel（小說）、prose（散文）中的篇目即可。
+       
+       作品篇目格式範例：
+       {
+         title: "篇名",
+         tagline: "題註或風格",
+         content: "正文內容...\n支援使用換行符號..."
+       }
+       若陣列為空 []，前台會自動呈現典雅的留白狀態。
+       ========================================================================== */
+    const STUDENTS_DATA = [
+      {
+        id: 0,
+        roman: "I",
+        name: "", // 請填寫姓名（例如："艾莉西亞"）
+        tag: "",  // 請填寫簡介（例如："古典聖詠 &bull; 典雅主義"）
+        works: {
+          poetry: [],
+          novel: [],
+          prose: []
+        }
+      },
+      {
+        id: 1,
+        roman: "II",
+        name: "", // 請填寫姓名（例如："林默"）
+        tag: "",  // 請填寫簡介（例如："理性思潮 &bull; 內省寫實"）
+        works: {
+          poetry: [],
+          novel: [],
+          prose: []
+        }
+      },
+      {
+        id: 2,
+        roman: "III",
+        name: "", // 請填寫姓名（例如："高橋律"）
+        tag: "",  // 請填寫簡介（例如："感官意識 &bull; 青春流徙"）
+        works: {
+          poetry: [],
+          novel: [],
+          prose: []
+        }
+      },
+      {
+        id: 3,
+        roman: "IV",
+        name: "", // 請填寫姓名（例如："桑亞"）
+        tag: "",  // 請填寫簡介（例如："自然母體 &bull; 鄉土靈性"）
+        works: {
+          poetry: [],
+          novel: [],
+          prose: []
+        }
+      },
+      {
+        id: 4,
+        roman: "V",
+        name: "", // 請填寫姓名（例如："艾爾莎"）
+        tag: "",  // 請填寫簡介（例如："英雄史詩 &bull; 悲劇詠嘆"）
+        works: {
+          poetry: [],
+          novel: [],
+          prose: []
+        }
+      },
+      {
+        id: 5,
+        roman: "VI",
+        name: "", // 請填寫姓名（例如："潯"）
+        tag: "",  // 請填寫簡介（例如："東方幽玄 &bull; 寂靜意境"）
+        works: {
+          poetry: [],
+          novel: [],
+          prose: []
+        }
+      }
+    ];
+
+    /* ========================================================
+       唯讀視圖渲染邏輯 (不可在網頁端增修)
+       ======================================================== */
+    const charactersStage = document.getElementById('charactersStage');
+    const portfolioOverlay = document.getElementById('portfolioOverlay');
+    const btnCloseModal = document.getElementById('btnCloseModal');
+    const modalAuthorName = document.getElementById('modalAuthorName');
+    const modalAuthorGenre = document.getElementById('modalAuthorGenre');
+    const genreTabs = document.querySelectorAll('.genre-tab');
+    const worksGrid = document.getElementById('worksGrid');
+    const worksListContainer = document.getElementById('worksListContainer');
+    const manuscriptReader = document.getElementById('manuscriptReader');
+    const btnReaderBack = document.getElementById('btnReaderBack');
+    const readerTitle = document.getElementById('readerTitle');
+    const readerSubtitle = document.getElementById('readerSubtitle');
+    const readerContent = document.getElementById('readerContent');
+
+    let currentStudentId = null;
+    let currentGenre = 'poetry';
+
+    // 渲染主舞台卡片
+    function renderMainStage() {
+      charactersStage.innerHTML = STUDENTS_DATA.map((st) => {
+        const hasName = st.name.trim().length > 0;
+        const displayName = hasName ? st.name : `學生 ${st.roman}`;
+        const displayTag = st.tag.trim().length > 0 ? st.tag : '典藏研習生';
+
+        return `
+          <div class="char-card" data-index="${st.id}" role="button" aria-label="檢視學生 ${st.roman} 的典藏冊">
+            <div class="char-visual"></div>
+            <div class="char-gradient-scrim"></div>
+            <div class="char-meta">
+              <span class="char-numeral">${st.roman}</span>
+              <h3 class="char-name ${hasName ? '' : 'is-empty'}">${displayName}</h3>
+              <p class="char-tag">${displayTag}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.querySelectorAll('.char-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const idx = parseInt(card.getAttribute('data-index'), 10);
+          openPortfolio(idx);
+        });
+      });
+    }
+
+    // 開啟手稿閱覽視窗
+    function openPortfolio(id) {
+      currentStudentId = id;
+      currentGenre = 'poetry';
+
+      const student = STUDENTS_DATA[currentStudentId];
+      const hasName = student.name.trim().length > 0;
+      modalAuthorName.textContent = hasName ? student.name : `學生 ${student.roman}`;
+      modalAuthorGenre.innerHTML = student.tag.trim().length > 0 ? student.tag : '典藏研習生';
+
+      genreTabs.forEach(t => t.classList.toggle('active', t.getAttribute('data-genre') === 'poetry'));
+
+      showWorksList();
+      renderWorks();
+
+      portfolioOverlay.classList.add('active');
+    }
+
+    // 渲染篇目清單
+    function renderWorks() {
+      const student = STUDENTS_DATA[currentStudentId];
+      const works = student.works[currentGenre] || [];
+
+      if (works.length === 0) {
+        worksGrid.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <div class="empty-symbol"></div>
+            <p class="empty-text">&mdash; 此卷目尚在整理之中 &mdash;</p>
+            <div class="empty-symbol"></div>
+          </div>
+        `;
+        return;
+      }
+
+      worksGrid.innerHTML = works.map((w, idx) => {
+        const excerpt = w.excerpt || (w.content ? w.content.replace(/\n/g, ' ').slice(0, 75) + '...' : '');
+        return `
+          <article class="work-item" data-work-idx="${idx}">
+            <h4 class="work-title">${w.title || '無題'}</h4>
+            <div class="work-tagline">${w.tagline || ''}</div>
+            <p class="work-excerpt">${excerpt}</p>
+          </article>
+        `;
+      }).join('');
+
+      // 點擊篇目進入全文閱讀
+      document.querySelectorAll('.work-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const idx = parseInt(item.getAttribute('data-work-idx'), 10);
+          openReader(works[idx]);
+        });
+      });
+    }
+
+    // 開啟單篇手稿閱讀
+    function openReader(work) {
+      worksListContainer.style.display = 'none';
+      manuscriptReader.classList.add('active');
+      readerTitle.textContent = work.title || '無題';
+      readerSubtitle.textContent = work.tagline || '';
+      readerContent.textContent = work.content || '';
+      document.querySelector('.book-body').scrollTop = 0;
+    }
+
+    function showWorksList() {
+      manuscriptReader.classList.remove('active');
+      worksListContainer.style.display = 'block';
+    }
+
+    function closePortfolio() {
+      portfolioOverlay.classList.remove('active');
+      setTimeout(showWorksList, 400);
+    }
+
+    // 分類切換
+    genreTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        genreTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentGenre = tab.getAttribute('data-genre');
+        showWorksList();
+        renderWorks();
+      });
+    });
+
+    btnCloseModal.addEventListener('click', closePortfolio);
+    btnReaderBack.addEventListener('click', showWorksList);
+
+    portfolioOverlay.addEventListener('click', (e) => {
+      if (e.target === portfolioOverlay) closePortfolio();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && portfolioOverlay.classList.contains('active')) {
+        closePortfolio();
+      }
+    });
+
+    /* ========================================================
+       金粉粒子 Canvas (無 EMOJI，純古典微粒光影)
+       ======================================================== */
+    const canvas = document.getElementById('goldDustCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class GoldParticle {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 1.8 + 0.6;
+        this.speedX = (Math.random() - 0.5) * 0.25;
+        this.speedY = -Math.random() * 0.35 - 0.1;
+        this.alpha = Math.random() * 0.5 + 0.15;
+        this.fade = (Math.random() * 0.006 + 0.002) * (Math.random() > 0.5 ? 1 : -1);
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.alpha += this.fade;
+        if (this.alpha <= 0.08 || this.alpha >= 0.65) this.fade = -this.fade;
+        if (this.y < -10 || this.x < -10 || this.x > canvas.width + 10) {
+          this.reset();
+          this.y = canvas.height + 10;
+        }
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(212, 175, 55, ${this.alpha})`;
+        ctx.shadowBlur = 6;
+        ctx.shadowColor = 'rgba(232, 211, 158, 0.7)';
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+    }
+
+    for (let i = 0; i < 36; i++) {
+      particles.push(new GoldParticle());
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // 初始化展示
+    renderMainStage();
+  </script>
+</body>
+</html>
