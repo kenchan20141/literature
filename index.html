@@ -100,7 +100,7 @@
        未登入學校帳號時的古典提醒橫幅 (Banner)
        ======================================================== */
     .auth-banner {
-      display: none; /* 預設不顯示，圖片載入失敗時經 JS 開啟 */
+      display: none;
       position: relative;
       z-index: 20;
       background: rgba(245, 239, 235, 0.95);
@@ -277,7 +277,7 @@
       left: 0;
       width: 100%;
       height: 84%;
-      display: none; /* 預設隱藏，若載入失敗才顯示 */
+      display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -287,12 +287,8 @@
       z-index: 2;
     }
 
-    body.needs-school-auth .card-auth-fallback {
-      display: flex;
-    }
-    body.needs-school-auth .char-visual {
-      display: none; /* 隱藏空白破圖 */
-    }
+    body.needs-school-auth .card-auth-fallback { display: flex; }
+    body.needs-school-auth .char-visual { display: none; }
 
     .fallback-seal {
       width: 48px;
@@ -347,7 +343,6 @@
       z-index: 2;
     }
 
-    /* 角色底部文字資訊 */
     .char-meta {
       position: relative;
       z-index: 4;
@@ -400,21 +395,22 @@
     }
 
     /* ========================================================
-       個人作品集 手稿視窗
+       個人作品集 手稿視窗 (重新設計的儀式感介面)
        ======================================================== */
     .portfolio-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(28, 22, 18, 0.65);
-      backdrop-filter: blur(8px);
+      background: rgba(18, 14, 12, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       z-index: 100;
       display: flex;
       align-items: center;
       justify-content: center;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.5s ease;
-      padding: 20px;
+      transition: opacity 0.6s ease;
+      padding: 30px;
     }
     .portfolio-overlay.active {
       opacity: 1;
@@ -424,26 +420,59 @@
     .manuscript-book {
       position: relative;
       width: 100%;
-      max-width: 980px;
+      max-width: 1024px;
       height: 88vh;
       background: var(--bg-parchment);
       border: 1px solid var(--gold-primary);
-      border-radius: 4px;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.4), inset 0 0 80px rgba(220, 200, 170, 0.4);
+      border-radius: 2px;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.6), inset 0 0 120px rgba(180, 150, 110, 0.15);
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      transform: scale(0.96) translateY(15px);
-      transition: transform 0.5s var(--transition-smooth);
+      transform: scale(0.97) translateY(20px);
+      transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
     .portfolio-overlay.active .manuscript-book {
       transform: scale(1) translateY(0);
     }
 
+    /* 專屬角色半透明背景層：儀式感的核心 */
+    .modal-char-bg-container {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .modal-char-bg {
+      /* 設定特定的長寬比，確保只會顯示單一角色，不會露出精靈圖中其他的角色 */
+      height: 120%;
+      aspect-ratio: 1 / 1.5;
+      background-image: url('https://lh3.googleusercontent.com/d/1pPd61CjmQpCXUKLwPoKLV6EXoZia8e60');
+      background-size: 615% auto;
+      background-repeat: no-repeat;
+      background-position-y: 50%;
+      opacity: 0.08; /* 極為幽微的透視感 */
+      filter: sepia(0.4) contrast(1.1) grayscale(0.2);
+      transition: background-position 0s; /* 切換時瞬間定位，不需滑動動畫 */
+    }
+
+    /* 將視窗內容提升層級，蓋在角色背景之上 */
+    .modal-content-wrapper {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
     .book-flourish {
       position: absolute;
-      width: 48px;
-      height: 48px;
+      width: 56px;
+      height: 56px;
       fill: none;
       stroke: var(--gold-primary);
       stroke-width: 1.2;
@@ -451,84 +480,119 @@
       z-index: 5;
     }
 
+    /* 莊重感的主標題區 */
     .book-header {
-      padding: 24px 36px 16px;
+      padding: 50px 36px 20px;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border-gold);
       position: relative;
-      background: rgba(255,255,255,0.25);
+      background: linear-gradient(to bottom, rgba(245, 239, 235, 0.95) 0%, rgba(245, 239, 235, 0) 100%);
     }
     .book-author-info {
       display: flex;
-      align-items: baseline;
-      gap: 16px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      text-align: center;
     }
     .book-author-name {
-      font-size: 26px;
+      font-size: 34px;
       font-weight: 700;
-      letter-spacing: 0.25em;
-      color: var(--ink-primary);
+      letter-spacing: 0.3em;
+      text-indent: 0.3em;
+      color: var(--gold-dark);
+      text-shadow: 0 1px 2px rgba(255,255,255,0.6);
+    }
+    .book-author-divider {
+      width: 40px;
+      height: 1px;
+      background: var(--gold-primary);
     }
     .book-author-genre {
       font-size: 13px;
-      letter-spacing: 0.18em;
-      color: var(--gold-dark);
-      font-style: italic;
+      letter-spacing: 0.35em;
+      text-indent: 0.35em;
+      color: var(--ink-faint);
     }
 
     .btn-close {
+      position: absolute;
+      top: 24px;
+      right: 24px;
       background: transparent;
-      border: 1px solid var(--border-gold);
-      width: 34px;
-      height: 34px;
+      border: 1px solid rgba(197, 160, 89, 0.4);
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      stroke: var(--ink-primary);
-      transition: all 0.3s;
+      stroke: var(--gold-dark);
+      transition: all 0.4s ease;
+      z-index: 10;
     }
     .btn-close:hover {
       border-color: var(--gold-dark);
-      background: rgba(197, 160, 89, 0.15);
-      stroke: var(--gold-dark);
+      background: rgba(197, 160, 89, 0.1);
       transform: rotate(90deg);
     }
 
+    /* 精緻的分類導航 */
     .genre-nav {
       display: flex;
-      padding: 0 36px;
-      background: rgba(230, 218, 200, 0.3);
-      border-bottom: 1px solid var(--border-gold);
+      justify-content: center;
+      align-items: center;
+      padding: 10px 0 20px;
+      gap: 45px;
     }
     .genre-tab {
-      padding: 14px 28px;
-      font-size: 15px;
-      letter-spacing: 0.3em;
-      color: var(--ink-light);
       background: transparent;
       border: none;
-      border-bottom: 2px solid transparent;
+      font-size: 14px;
+      letter-spacing: 0.4em;
+      text-indent: 0.4em;
+      color: var(--ink-faint);
       cursor: pointer;
       font-family: inherit;
-      transition: all 0.3s;
+      position: relative;
+      padding: 10px 0;
+      transition: color 0.3s;
+    }
+    .genre-tab::after {
+      content: '♦';
+      position: absolute;
+      right: -28px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(197, 160, 89, 0.4);
+      font-size: 10px;
+    }
+    .genre-tab:last-child::after {
+      content: '';
     }
     .genre-tab:hover {
       color: var(--ink-primary);
     }
     .genre-tab.active {
       color: var(--gold-dark);
-      border-bottom-color: var(--gold-dark);
       font-weight: 600;
+    }
+    .genre-tab.active::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 1px;
+      background: var(--gold-dark);
     }
 
     .book-body {
       flex: 1;
-      padding: 30px 36px;
+      padding: 20px 36px 60px;
       overflow-y: auto;
       scrollbar-width: thin;
       scrollbar-color: var(--gold-primary) transparent;
@@ -540,141 +604,178 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 240px;
+      height: 300px;
       text-align: center;
-      gap: 16px;
+      gap: 20px;
     }
     .empty-symbol {
-      width: 36px;
+      width: 40px;
       height: 1px;
       background: var(--gold-primary);
-      opacity: 0.6;
+      opacity: 0.5;
     }
     .empty-text {
       font-size: 14px;
-      letter-spacing: 0.35em;
+      letter-spacing: 0.4em;
       color: var(--ink-faint);
       font-style: italic;
     }
 
+    /* 條目列表：改為莊重的篇章目錄結構 */
     .works-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 680px;
+      margin: 0 auto;
     }
 
     .work-item {
-      background: rgba(255, 255, 255, 0.55);
-      border: 1px solid rgba(197, 160, 89, 0.28);
-      border-radius: 3px;
-      padding: 22px 20px;
+      width: 100%;
+      background: transparent;
+      border: none;
+      padding: 40px 20px;
       cursor: pointer;
-      transition: all 0.4s var(--transition-smooth);
+      text-align: center;
       position: relative;
-    }
-    .work-item::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 3px;
-      height: 0%;
-      background: var(--gold-primary);
-      transition: height 0.35s ease;
+      transition: opacity 0.4s ease;
     }
     .work-item:hover {
-      background: rgba(255, 255, 255, 0.9);
-      border-color: var(--gold-primary);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px rgba(140, 109, 55, 0.08);
+      opacity: 0.65;
     }
-    .work-item:hover::after {
-      height: 100%;
+    /* 章節分隔飾紋 */
+    .work-item::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 1px;
+      background: rgba(197, 160, 89, 0.3);
+      margin: 40px auto -40px;
+    }
+    .work-item:last-child::after {
+      display: none;
     }
 
+    .work-numeral {
+      font-family: 'Cinzel', serif;
+      color: var(--gold-light);
+      font-size: 16px;
+      letter-spacing: 0.2em;
+      margin-bottom: 12px;
+    }
     .work-title {
-      font-size: 17px;
+      font-size: 24px;
       font-weight: 600;
-      letter-spacing: 0.15em;
+      letter-spacing: 0.25em;
+      text-indent: 0.25em;
       color: var(--ink-primary);
-      margin-bottom: 6px;
+      margin-bottom: 10px;
     }
     .work-tagline {
       font-size: 12px;
       color: var(--gold-dark);
-      letter-spacing: 0.18em;
-      margin-bottom: 12px;
+      letter-spacing: 0.25em;
+      margin-bottom: 24px;
     }
     .work-excerpt {
-      font-size: 13px;
-      line-height: 1.8;
+      font-size: 14px;
+      line-height: 2.2;
       color: var(--ink-light);
-      text-align: justify;
+      max-width: 520px;
+      margin: 0 auto;
       display: -webkit-box;
-      -webkit-line-clamp: 3;
+      -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      font-style: italic;
     }
 
+    /* 閱讀全貌的排版設計 */
     .manuscript-reader {
       display: none;
-      animation: fadeIn 0.4s ease;
+      animation: fadeInReader 0.6s ease;
+      max-width: 720px;
+      margin: 0 auto;
+      padding-bottom: 40px;
     }
     .manuscript-reader.active {
       display: block;
     }
+    .reader-top-bar {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
     .reader-back {
       font-size: 12px;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.3em;
+      text-indent: 0.3em;
       color: var(--gold-dark);
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      margin-bottom: 20px;
+      gap: 8px;
       border: none;
       background: none;
       font-family: inherit;
+      padding: 8px 16px;
+      border: 1px solid transparent;
+      transition: all 0.3s;
     }
     .reader-back:hover {
-      text-decoration: underline;
+      border-color: rgba(197, 160, 89, 0.4);
+      background: rgba(255,255,255,0.3);
+      border-radius: 20px;
+    }
+    
+    .reader-header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    .reader-ornament {
+      color: var(--gold-light);
+      font-size: 20px;
+      margin-bottom: 20px;
+      font-family: 'Cinzel', serif;
     }
     .reader-title {
-      font-size: 24px;
-      letter-spacing: 0.2em;
+      font-size: 32px;
+      letter-spacing: 0.25em;
+      text-indent: 0.25em;
       color: var(--ink-primary);
-      text-align: center;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
     .reader-subtitle {
-      font-size: 12px;
+      font-size: 13px;
       letter-spacing: 0.3em;
-      text-align: center;
       color: var(--gold-dark);
-      margin-bottom: 30px;
     }
+    
     .reader-content {
-      max-width: 640px;
-      margin: 0 auto;
-      font-size: 15px;
-      line-height: 2.3;
-      color: var(--ink-light);
+      font-size: 16px;
+      line-height: 2.6;
+      color: var(--ink-primary);
       text-align: justify;
       white-space: pre-line;
-      padding: 0 10px;
+      padding: 0 20px;
     }
     .reader-content::first-letter {
       float: left;
-      font-size: 40px;
+      font-size: 48px;
       line-height: 1;
-      padding-right: 12px;
+      padding-right: 14px;
       font-family: 'Cinzel', serif;
       color: var(--gold-dark);
       font-weight: 700;
+      margin-top: 4px;
     }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInReader {
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -695,24 +796,32 @@
         scroll-snap-align: center;
       }
       .book-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
+        padding: 40px 20px 16px;
+      }
+      .book-author-name {
+        font-size: 24px;
       }
       .btn-close {
-        position: absolute;
-        top: 20px;
-        right: 20px;
+        top: 16px;
+        right: 16px;
       }
       .genre-nav {
-        padding: 0 16px;
+        gap: 20px;
       }
       .genre-tab {
-        padding: 12px 16px;
-        font-size: 14px;
+        font-size: 13px;
+      }
+      .genre-tab::after {
+        right: -14px;
       }
       .book-body {
         padding: 20px 16px;
+      }
+      .work-title {
+        font-size: 20px;
+      }
+      .reader-title {
+        font-size: 26px;
       }
     }
   </style>
@@ -738,7 +847,7 @@
       <p class="sub-title">文 學 人 典 藏 冊</p>
     </header>
 
-    <!-- 頂部權限提示橫幅 (當非學校帳號、圖片無法讀取時自動展開) -->
+    <!-- 頂部權限提示橫幅 -->
     <aside class="auth-banner" id="authBanner" aria-live="polite">
       <div class="auth-banner-text">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold-dark)" stroke-width="2">
@@ -754,7 +863,7 @@
       </div>
     </aside>
 
-    <!-- 6 位學生角色主舞台 -->
+    <!-- 主舞台 -->
     <main class="characters-stage" id="charactersStage"></main>
 
     <footer>
@@ -762,52 +871,69 @@
     </footer>
   </div>
 
-  <!-- 個人手稿典藏視窗 (純讀取) -->
+  <!-- 個人手稿典藏視窗 (帶有儀式感的修訂版) -->
   <div class="portfolio-overlay" id="portfolioOverlay">
     <div class="manuscript-book">
-      <svg class="book-flourish top-left" viewBox="0 0 60 60"><path d="M2 58 V16 A14 14 0 0 1 16 2 H58"/></svg>
-      <svg class="book-flourish top-right" viewBox="0 0 60 60" style="transform: scaleX(-1);"><path d="M2 58 V16 A14 14 0 0 1 16 2 H58"/></svg>
+      
+      <!-- 動態載入專屬角色的半透明背景 -->
+      <div class="modal-char-bg-container">
+        <div class="modal-char-bg" id="modalCharBg"></div>
+      </div>
 
-      <!-- 作者資訊 -->
-      <div class="book-header">
-        <div class="book-author-info">
-          <h2 class="book-author-name" id="modalAuthorName">學生姓名</h2>
-          <span class="book-author-genre" id="modalAuthorGenre">文學方向</span>
-        </div>
+      <!-- 確保內容在背景之上的容器 -->
+      <div class="modal-content-wrapper">
+        <svg class="book-flourish top-left" viewBox="0 0 60 60"><path d="M2 58 V16 A14 14 0 0 1 16 2 H58"/></svg>
+        <svg class="book-flourish top-right" viewBox="0 0 60 60" style="transform: scaleX(-1);"><path d="M2 58 V16 A14 14 0 0 1 16 2 H58"/></svg>
+
         <button class="btn-close" id="btnCloseModal" title="闔上手稿">
-          <svg width="14" height="14" viewBox="0 0 14 14" stroke-width="1.8">
+          <svg width="16" height="16" viewBox="0 0 14 14" stroke-width="1.5">
             <line x1="1" y1="1" x2="13" y2="13" />
             <line x1="13" y1="1" x2="1" y2="13" />
           </svg>
         </button>
-      </div>
 
-      <!-- 分類導航 -->
-      <nav class="genre-nav">
-        <button class="genre-tab active" data-genre="poetry">詩 歌</button>
-        <button class="genre-tab" data-genre="novel">小 說</button>
-        <button class="genre-tab" data-genre="prose">散 文</button>
-      </nav>
-
-      <!-- 篇目內容展示區 -->
-      <div class="book-body">
-        <div id="worksListContainer">
-          <div class="works-grid" id="worksGrid"></div>
+        <!-- 莊嚴的首部作者資訊 -->
+        <div class="book-header">
+          <div class="book-author-info">
+            <h2 class="book-author-name" id="modalAuthorName">學生姓名</h2>
+            <div class="book-author-divider"></div>
+            <span class="book-author-genre" id="modalAuthorGenre">文學方向</span>
+          </div>
         </div>
 
-        <!-- 篇目全篇閱讀視圖 -->
-        <div class="manuscript-reader" id="manuscriptReader">
-          <button class="reader-back" id="btnReaderBack">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M8 2 L4 6 L8 10"/>
-            </svg>
-            返 回 篇 目
-          </button>
-          <h3 class="reader-title" id="readerTitle">篇目名</h3>
-          <p class="reader-subtitle" id="readerSubtitle">體裁與題註</p>
-          <div class="reader-content" id="readerContent"></div>
+        <!-- 分類導航 -->
+        <nav class="genre-nav">
+          <button class="genre-tab active" data-genre="poetry">詩 歌</button>
+          <button class="genre-tab" data-genre="novel">小 說</button>
+          <button class="genre-tab" data-genre="prose">散 文</button>
+        </nav>
+
+        <!-- 篇目內容展示區 -->
+        <div class="book-body">
+          <div id="worksListContainer">
+            <div class="works-grid" id="worksGrid"></div>
+          </div>
+
+          <!-- 全篇閱讀視圖 -->
+          <div class="manuscript-reader" id="manuscriptReader">
+            <div class="reader-top-bar">
+              <button class="reader-back" id="btnReaderBack">
+                <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M8 2 L4 6 L8 10"/>
+                </svg>
+                闔 上 篇 目
+              </button>
+            </div>
+            <div class="reader-header">
+              <div class="reader-ornament">❦</div>
+              <h3 class="reader-title" id="readerTitle">篇目名</h3>
+              <p class="reader-subtitle" id="readerSubtitle">體裁與題註</p>
+            </div>
+            <div class="reader-content" id="readerContent"></div>
+          </div>
         </div>
       </div>
+      
     </div>
   </div>
 
@@ -818,7 +944,6 @@
     const GOOGLE_DRIVE_FILE_ID = "1pPd61CjmQpCXUKLwPoKLV6EXoZia8e60";
     const DIRECT_IMG_URL = `https://lh3.googleusercontent.com/d/${GOOGLE_DRIVE_FILE_ID}`;
     
-    // 點擊後開啟 Google Account Chooser，引導切換至學校帳號
     function switchSchoolAccount() {
       const authUrl = `https://accounts.google.com/AccountChooser?continue=https://drive.google.com/file/d/${GOOGLE_DRIVE_FILE_ID}/view`;
       window.open(authUrl, '_blank', 'noopener,noreferrer');
@@ -828,15 +953,10 @@
       document.getElementById('authBanner').classList.remove('visible');
     }
 
-    // 檢測圖片是否因權限問題無法載入
     function detectImageAccess() {
       const probe = new Image();
-      probe.onload = () => {
-        // 成功載入，保持原始狀態
-        document.body.classList.remove('needs-school-auth');
-      };
+      probe.onload = () => document.body.classList.remove('needs-school-auth');
       probe.onerror = () => {
-        // 載入失敗（非學校網域或未登入）：啟動優雅降級介面
         document.body.classList.add('needs-school-auth');
         document.getElementById('authBanner').classList.add('visible');
       };
@@ -847,41 +967,11 @@
        【學生資料與作品典藏設定區】
        ========================================================================== */
     const STUDENTS_DATA = [
-      {
-        id: 0,
-        roman: "I",
-        name: "",
-        tag: "",
-        works: { poetry: [], novel: [], prose: [] }
-      },
-      {
-        id: 1,
-        roman: "II",
-        name: "",
-        tag: "",
-        works: { poetry: [], novel: [], prose: [] }
-      },
-      {
-        id: 2,
-        roman: "III",
-        name: "",
-        tag: "",
-        works: { poetry: [], novel: [], prose: [] }
-      },
-      {
-        id: 3,
-        roman: "IV",
-        name: "",
-        tag: "",
-        works: { poetry: [], novel: [], prose: [] }
-      },
-      {
-        id: 4,
-        roman: "V",
-        name: "",
-        tag: "",
-        works: { poetry: [], novel: [], prose: [] }
-      },
+      { id: 0, roman: "I", name: "", tag: "", works: { poetry: [], novel: [], prose: [] } },
+      { id: 1, roman: "II", name: "", tag: "", works: { poetry: [], novel: [], prose: [] } },
+      { id: 2, roman: "III", name: "", tag: "", works: { poetry: [], novel: [], prose: [] } },
+      { id: 3, roman: "IV", name: "", tag: "", works: { poetry: [], novel: [], prose: [] } },
+      { id: 4, roman: "V", name: "", tag: "", works: { poetry: [], novel: [], prose: [] } },
       {
         id: 5,
         roman: "VI",
@@ -963,6 +1053,10 @@
       }
     ];
 
+    /* 各角色的精靈圖背景 X 軸定位 (對應 CSS 中設定的值) */
+    const CHAR_BG_POSITIONS = ['7.5%', '25.5%', '43%', '59%', '76.5%', '94.5%'];
+    const ROMAN_NUMERALS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+
     /* ========================================================
        唯讀視圖渲染邏輯
        ======================================================== */
@@ -971,6 +1065,7 @@
     const btnCloseModal = document.getElementById('btnCloseModal');
     const modalAuthorName = document.getElementById('modalAuthorName');
     const modalAuthorGenre = document.getElementById('modalAuthorGenre');
+    const modalCharBg = document.getElementById('modalCharBg');
     const genreTabs = document.querySelectorAll('.genre-tab');
     const worksGrid = document.getElementById('worksGrid');
     const worksListContainer = document.getElementById('worksListContainer');
@@ -983,7 +1078,6 @@
     let currentStudentId = null;
     let currentGenre = 'poetry';
 
-    // 渲染主舞台卡片
     function renderMainStage() {
       charactersStage.innerHTML = STUDENTS_DATA.map((st) => {
         const hasName = st.name.trim().length > 0;
@@ -992,10 +1086,7 @@
 
         return `
           <div class="char-card" data-index="${st.id}" role="button" aria-label="檢視學生 ${st.roman} 的典藏冊">
-            <!-- 正常立繪層 -->
             <div class="char-visual"></div>
-
-            <!-- 權限不足時的古典後備畫面 -->
             <div class="card-auth-fallback">
               <div class="fallback-seal">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
@@ -1009,7 +1100,6 @@
                 登入學校帳號
               </button>
             </div>
-
             <div class="char-gradient-scrim"></div>
             <div class="char-meta">
               <span class="char-numeral">${st.roman}</span>
@@ -1028,15 +1118,17 @@
       });
     }
 
-    // 開啟手稿閱覽視窗
     function openPortfolio(id) {
       currentStudentId = id;
       currentGenre = 'poetry';
-
       const student = STUDENTS_DATA[currentStudentId];
+      
       const hasName = student.name.trim().length > 0;
       modalAuthorName.textContent = hasName ? student.name : `學生 ${student.roman}`;
       modalAuthorGenre.innerHTML = student.tag.trim().length > 0 ? student.tag : '典藏研習生';
+
+      // 替換 Modal 背景的專屬角色立繪位置
+      modalCharBg.style.backgroundPositionX = CHAR_BG_POSITIONS[id] || '50%';
 
       genreTabs.forEach(t => t.classList.toggle('active', t.getAttribute('data-genre') === 'poetry'));
 
@@ -1046,16 +1138,15 @@
       portfolioOverlay.classList.add('active');
     }
 
-    // 渲染篇目清單
     function renderWorks() {
       const student = STUDENTS_DATA[currentStudentId];
       const works = student.works[currentGenre] || [];
 
       if (works.length === 0) {
         worksGrid.innerHTML = `
-          <div class="empty-state" style="grid-column: 1 / -1;">
+          <div class="empty-state">
             <div class="empty-symbol"></div>
-            <p class="empty-text">&mdash; 此卷目尚在整理之中 &mdash;</p>
+            <p class="empty-text">卷 冊 空 缺 尚 待 補 遺</p>
             <div class="empty-symbol"></div>
           </div>
         `;
@@ -1063,9 +1154,11 @@
       }
 
       worksGrid.innerHTML = works.map((w, idx) => {
-        const excerpt = w.excerpt || (w.content ? w.content.replace(/\n/g, ' ').slice(0, 75) + '...' : '');
+        const excerpt = w.excerpt || (w.content ? w.content.replace(/\n/g, ' ').slice(0, 60) + '...' : '');
+        const chNum = ROMAN_NUMERALS[idx] || (idx + 1);
         return `
           <article class="work-item" data-work-idx="${idx}">
+            <div class="work-numeral">Chapter ${chNum}</div>
             <h4 class="work-title">${w.title || '無題'}</h4>
             <div class="work-tagline">${w.tagline || ''}</div>
             <p class="work-excerpt">${excerpt}</p>
@@ -1081,7 +1174,6 @@
       });
     }
 
-    // 開啟單篇手稿閱讀
     function openReader(work) {
       worksListContainer.style.display = 'none';
       manuscriptReader.classList.add('active');
@@ -1098,7 +1190,7 @@
 
     function closePortfolio() {
       portfolioOverlay.classList.remove('active');
-      setTimeout(showWorksList, 400);
+      setTimeout(showWorksList, 600);
     }
 
     genreTabs.forEach(tab => {
