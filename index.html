@@ -395,7 +395,7 @@
     }
 
     /* ========================================================
-       個人作品集 手稿視窗 (重新設計的儀式感介面)
+       個人作品集 手稿視窗
        ======================================================== */
     .portfolio-overlay {
       position: fixed;
@@ -436,7 +436,7 @@
       transform: scale(1) translateY(0);
     }
 
-    /* 專屬角色半透明背景層：儀式感的核心 */
+    /* 專屬角色半透明背景層 */
     .modal-char-bg-container {
       position: absolute;
       inset: 0;
@@ -448,19 +448,18 @@
       pointer-events: none;
     }
     .modal-char-bg {
-      /* 設定特定的長寬比，確保只會顯示單一角色，不會露出精靈圖中其他的角色 */
       height: 120%;
       aspect-ratio: 1 / 1.5;
       background-image: url('https://lh3.googleusercontent.com/d/1pPd61CjmQpCXUKLwPoKLV6EXoZia8e60');
       background-size: 615% auto;
       background-repeat: no-repeat;
       background-position-y: 50%;
-      opacity: 0.08; /* 極為幽微的透視感 */
-      filter: sepia(0.4) contrast(1.1) grayscale(0.2);
-      transition: background-position 0s; /* 切換時瞬間定位，不需滑動動畫 */
+      opacity: 0.15; 
+      filter: sepia(0.3) contrast(1.1) grayscale(0.1);
+      transition: background-position 0s;
     }
 
-    /* 將視窗內容提升層級，蓋在角色背景之上 */
+    /* 視窗內容層 */
     .modal-content-wrapper {
       position: relative;
       z-index: 1;
@@ -477,17 +476,44 @@
       stroke: var(--gold-primary);
       stroke-width: 1.2;
       pointer-events: none;
-      z-index: 5;
+      z-index: 15;
     }
 
-    /* 莊重感的主標題區 */
+    .btn-close {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      background: transparent;
+      border: 1px solid rgba(197, 160, 89, 0.4);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      stroke: var(--gold-dark);
+      transition: all 0.4s ease;
+      z-index: 20;
+    }
+    .btn-close:hover {
+      border-color: var(--gold-dark);
+      background: rgba(197, 160, 89, 0.1);
+      transform: rotate(90deg);
+    }
+
+    /* 標題與分類區 */
+    .modal-header-area {
+      background: linear-gradient(to bottom, rgba(245, 239, 235, 1) 0%, rgba(245, 239, 235, 0.95) 60%, rgba(245, 239, 235, 0) 100%);
+      padding-top: 50px;
+      position: relative;
+      z-index: 10;
+    }
     .book-header {
-      padding: 50px 36px 20px;
+      padding: 0 36px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      position: relative;
-      background: linear-gradient(to bottom, rgba(245, 239, 235, 0.95) 0%, rgba(245, 239, 235, 0) 100%);
     }
     .book-author-info {
       display: flex;
@@ -516,30 +542,6 @@
       color: var(--ink-faint);
     }
 
-    .btn-close {
-      position: absolute;
-      top: 24px;
-      right: 24px;
-      background: transparent;
-      border: 1px solid rgba(197, 160, 89, 0.4);
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      stroke: var(--gold-dark);
-      transition: all 0.4s ease;
-      z-index: 10;
-    }
-    .btn-close:hover {
-      border-color: var(--gold-dark);
-      background: rgba(197, 160, 89, 0.1);
-      transform: rotate(90deg);
-    }
-
-    /* 精緻的分類導航 */
     .genre-nav {
       display: flex;
       justify-content: center;
@@ -592,11 +594,27 @@
 
     .book-body {
       flex: 1;
-      padding: 20px 36px 60px;
+      padding: 10px 36px 60px;
       overflow-y: auto;
       scrollbar-width: thin;
       scrollbar-color: var(--gold-primary) transparent;
       position: relative;
+    }
+
+    /* 
+      ====================================================
+      修改：閱讀面板底板 (Content Plate) - 磨砂玻璃效果
+      ====================================================
+    */
+    .content-plate {
+      background: rgba(252, 249, 245, 0.65); /* 降低不透明度，增加通透感 */
+      backdrop-filter: blur(16px);           /* 加強磨砂玻璃模糊效果 */
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(197, 160, 89, 0.25);
+      box-shadow: 0 15px 40px rgba(140, 109, 55, 0.06), inset 0 0 30px rgba(255, 255, 255, 0.4);
+      border-radius: 6px;
+      max-width: 760px;
+      margin: 0 auto;
     }
 
     .empty-state {
@@ -607,6 +625,7 @@
       height: 300px;
       text-align: center;
       gap: 20px;
+      padding: 40px;
     }
     .empty-symbol {
       width: 40px;
@@ -621,36 +640,39 @@
       font-style: italic;
     }
 
-    /* 條目列表：改為莊重的篇章目錄結構 */
+    /* 
+      ====================================================
+      修改：簡潔化目錄清單 (僅保留 Chapter 標號與作品標題)
+      ====================================================
+    */
     .works-grid {
       display: flex;
       flex-direction: column;
       align-items: center;
-      max-width: 680px;
-      margin: 0 auto;
+      padding: 20px 40px;
     }
 
     .work-item {
       width: 100%;
       background: transparent;
       border: none;
-      padding: 40px 20px;
+      padding: 30px 20px; /* 縮小間距使排版更緊湊 */
       cursor: pointer;
       text-align: center;
       position: relative;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.4s ease, transform 0.4s ease;
     }
     .work-item:hover {
-      opacity: 0.65;
+      opacity: 0.7;
+      transform: translateY(-2px);
     }
-    /* 章節分隔飾紋 */
     .work-item::after {
       content: '';
       display: block;
-      width: 60px;
+      width: 40px;
       height: 1px;
       background: rgba(197, 160, 89, 0.3);
-      margin: 40px auto -40px;
+      margin: 30px auto -30px; 
     }
     .work-item:last-child::after {
       display: none;
@@ -669,37 +691,18 @@
       letter-spacing: 0.25em;
       text-indent: 0.25em;
       color: var(--ink-primary);
-      margin-bottom: 10px;
-    }
-    .work-tagline {
-      font-size: 12px;
-      color: var(--gold-dark);
-      letter-spacing: 0.25em;
-      margin-bottom: 24px;
-    }
-    .work-excerpt {
-      font-size: 14px;
-      line-height: 2.2;
-      color: var(--ink-light);
-      max-width: 520px;
-      margin: 0 auto;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      font-style: italic;
     }
 
-    /* 閱讀全貌的排版設計 */
+    /* 內文閱讀視圖 (維持原本的樣式配置) */
     .manuscript-reader {
       display: none;
       animation: fadeInReader 0.6s ease;
-      max-width: 720px;
-      margin: 0 auto;
-      padding-bottom: 40px;
+      padding: 50px 60px;
     }
     .manuscript-reader.active {
       display: block;
+      /* 閱讀內文時，底板稍微加深以保證易讀性 */
+      background: rgba(252, 249, 245, 0.85); 
     }
     .reader-top-bar {
       display: flex;
@@ -724,7 +727,7 @@
     }
     .reader-back:hover {
       border-color: rgba(197, 160, 89, 0.4);
-      background: rgba(255,255,255,0.3);
+      background: rgba(197, 160, 89, 0.08);
       border-radius: 20px;
     }
     
@@ -759,16 +762,16 @@
       white-space: pre-line;
       padding: 0 20px;
     }
-    .reader-content::first-letter {
-      float: left;
-      font-size: 48px;
-      line-height: 1;
-      padding-right: 14px;
-      font-family: 'Cinzel', serif;
-      color: var(--gold-dark);
-      font-weight: 700;
-      margin-top: 4px;
-    }
+.reader-content::first-letter {
+  font-size: 42px;
+  color: var(--gold-dark);
+  font-weight: 700;
+  margin-right: 4px;
+  
+  /* 關鍵修復：強制首字行高為 1，不讓它繼承原本 2.6 的大行高 */
+  line-height: 1; 
+  vertical-align: -10%; /* 微調下沉感，讓大字與旁邊的文字對齊得更好 */
+}
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-6px); }
@@ -795,8 +798,11 @@
         height: 480px;
         scroll-snap-align: center;
       }
+      .modal-header-area {
+        padding-top: 30px;
+      }
       .book-header {
-        padding: 40px 20px 16px;
+        padding: 0 20px 16px;
       }
       .book-author-name {
         font-size: 24px;
@@ -815,13 +821,19 @@
         right: -14px;
       }
       .book-body {
-        padding: 20px 16px;
+        padding: 10px 16px 30px;
+      }
+      .works-grid, .manuscript-reader {
+        padding: 20px;
       }
       .work-title {
         font-size: 20px;
       }
       .reader-title {
         font-size: 26px;
+      }
+      .reader-content {
+        padding: 0;
       }
     }
   </style>
@@ -832,7 +844,6 @@
   <div class="paper-noise"></div>
   <canvas id="goldDustCanvas"></canvas>
 
-  <!-- 金色外框與四角飾紋 -->
   <div class="antique-frame">
     <div class="antique-frame-inner"></div>
     <svg class="corner-flourish top-left" viewBox="0 0 100 100"><path d="M4 96 V 24 C 4 12, 12 4, 24 4 H 96 M12 96 V 30 C 12 20, 20 12, 30 12 H 96"/><circle cx="28" cy="28" r="4" fill="var(--gold-primary)"/></svg>
@@ -847,7 +858,6 @@
       <p class="sub-title">文 學 人 典 藏 冊</p>
     </header>
 
-    <!-- 頂部權限提示橫幅 -->
     <aside class="auth-banner" id="authBanner" aria-live="polite">
       <div class="auth-banner-text">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold-dark)" stroke-width="2">
@@ -863,7 +873,6 @@
       </div>
     </aside>
 
-    <!-- 主舞台 -->
     <main class="characters-stage" id="charactersStage"></main>
 
     <footer>
@@ -871,16 +880,13 @@
     </footer>
   </div>
 
-  <!-- 個人手稿典藏視窗 (帶有儀式感的修訂版) -->
   <div class="portfolio-overlay" id="portfolioOverlay">
     <div class="manuscript-book">
       
-      <!-- 動態載入專屬角色的半透明背景 -->
       <div class="modal-char-bg-container">
         <div class="modal-char-bg" id="modalCharBg"></div>
       </div>
 
-      <!-- 確保內容在背景之上的容器 -->
       <div class="modal-content-wrapper">
         <svg class="book-flourish top-left" viewBox="0 0 60 60"><path d="M2 58 V16 A14 14 0 0 1 16 2 H58"/></svg>
         <svg class="book-flourish top-right" viewBox="0 0 60 60" style="transform: scaleX(-1);"><path d="M2 58 V16 A14 14 0 0 1 16 2 H58"/></svg>
@@ -892,30 +898,29 @@
           </svg>
         </button>
 
-        <!-- 莊嚴的首部作者資訊 -->
-        <div class="book-header">
-          <div class="book-author-info">
-            <h2 class="book-author-name" id="modalAuthorName">學生姓名</h2>
-            <div class="book-author-divider"></div>
-            <span class="book-author-genre" id="modalAuthorGenre">文學方向</span>
+        <div class="modal-header-area">
+          <div class="book-header">
+            <div class="book-author-info">
+              <h2 class="book-author-name" id="modalAuthorName">學生姓名</h2>
+              <div class="book-author-divider"></div>
+              <span class="book-author-genre" id="modalAuthorGenre">文學方向</span>
+            </div>
           </div>
+
+          <nav class="genre-nav">
+            <button class="genre-tab active" data-genre="poetry">詩 歌</button>
+            <button class="genre-tab" data-genre="novel">小 說</button>
+            <button class="genre-tab" data-genre="prose">散 文</button>
+          </nav>
         </div>
 
-        <!-- 分類導航 -->
-        <nav class="genre-nav">
-          <button class="genre-tab active" data-genre="poetry">詩 歌</button>
-          <button class="genre-tab" data-genre="novel">小 說</button>
-          <button class="genre-tab" data-genre="prose">散 文</button>
-        </nav>
-
-        <!-- 篇目內容展示區 -->
         <div class="book-body">
+          
           <div id="worksListContainer">
-            <div class="works-grid" id="worksGrid"></div>
+            <div class="works-grid content-plate" id="worksGrid"></div>
           </div>
 
-          <!-- 全篇閱讀視圖 -->
-          <div class="manuscript-reader" id="manuscriptReader">
+          <div class="manuscript-reader content-plate" id="manuscriptReader">
             <div class="reader-top-bar">
               <button class="reader-back" id="btnReaderBack">
                 <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -931,6 +936,7 @@
             </div>
             <div class="reader-content" id="readerContent"></div>
           </div>
+          
         </div>
       </div>
       
@@ -938,9 +944,6 @@
   </div>
 
   <script>
-    /* ==========================================================================
-       【Google 雲端身分授權設定】
-       ========================================================================== */
     const GOOGLE_DRIVE_FILE_ID = "1pPd61CjmQpCXUKLwPoKLV6EXoZia8e60";
     const DIRECT_IMG_URL = `https://lh3.googleusercontent.com/d/${GOOGLE_DRIVE_FILE_ID}`;
     
@@ -963,9 +966,6 @@
       probe.src = DIRECT_IMG_URL;
     }
 
-    /* ==========================================================================
-       【學生資料與作品典藏設定區】
-       ========================================================================== */
     const STUDENTS_DATA = [
       { id: 0, roman: "I", name: "", tag: "", works: { poetry: [], novel: [], prose: [] } },
       { id: 1, roman: "II", name: "", tag: "", works: { poetry: [], novel: [], prose: [] } },
@@ -982,9 +982,7 @@
             {
               title: "鳳攸東街",
               tagline: "",
-              content: `
-
-高大的榕樹
+              content: `高大的榕樹
 屹立在筆直街道
 長長鬍鬚
 隨風輕輕飄搖
@@ -1053,13 +1051,9 @@
       }
     ];
 
-    /* 各角色的精靈圖背景 X 軸定位 (對應 CSS 中設定的值) */
     const CHAR_BG_POSITIONS = ['7.5%', '25.5%', '43%', '59%', '76.5%', '94.5%'];
     const ROMAN_NUMERALS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
 
-    /* ========================================================
-       唯讀視圖渲染邏輯
-       ======================================================== */
     const charactersStage = document.getElementById('charactersStage');
     const portfolioOverlay = document.getElementById('portfolioOverlay');
     const btnCloseModal = document.getElementById('btnCloseModal');
@@ -1127,7 +1121,6 @@
       modalAuthorName.textContent = hasName ? student.name : `學生 ${student.roman}`;
       modalAuthorGenre.innerHTML = student.tag.trim().length > 0 ? student.tag : '典藏研習生';
 
-      // 替換 Modal 背景的專屬角色立繪位置
       modalCharBg.style.backgroundPositionX = CHAR_BG_POSITIONS[id] || '50%';
 
       genreTabs.forEach(t => t.classList.toggle('active', t.getAttribute('data-genre') === 'poetry'));
@@ -1153,15 +1146,13 @@
         return;
       }
 
+      // 【核心修改】只輸出 Chapter 序號與作品標題，不顯示內文預覽
       worksGrid.innerHTML = works.map((w, idx) => {
-        const excerpt = w.excerpt || (w.content ? w.content.replace(/\n/g, ' ').slice(0, 60) + '...' : '');
         const chNum = ROMAN_NUMERALS[idx] || (idx + 1);
         return `
           <article class="work-item" data-work-idx="${idx}">
             <div class="work-numeral">Chapter ${chNum}</div>
             <h4 class="work-title">${w.title || '無題'}</h4>
-            <div class="work-tagline">${w.tagline || ''}</div>
-            <p class="work-excerpt">${excerpt}</p>
           </article>
         `;
       }).join('');
@@ -1216,9 +1207,6 @@
       }
     });
 
-    /* ========================================================
-       金粉粒子 Canvas
-       ======================================================== */
     const canvas = document.getElementById('goldDustCanvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
@@ -1276,7 +1264,6 @@
     }
     animateParticles();
 
-    // 啟動主流程
     renderMainStage();
     detectImageAccess();
   </script>
