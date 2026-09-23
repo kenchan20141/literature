@@ -601,14 +601,10 @@
       position: relative;
     }
 
-    /* 
-      ====================================================
-      修改：閱讀面板底板 (Content Plate) - 磨砂玻璃效果
-      ====================================================
-    */
+    /* 閱讀面板底板 (Content Plate) - 磨砂玻璃效果 */
     .content-plate {
-      background: rgba(252, 249, 245, 0.65); /* 降低不透明度，增加通透感 */
-      backdrop-filter: blur(16px);           /* 加強磨砂玻璃模糊效果 */
+      background: rgba(252, 249, 245, 0.65);
+      backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(197, 160, 89, 0.25);
       box-shadow: 0 15px 40px rgba(140, 109, 55, 0.06), inset 0 0 30px rgba(255, 255, 255, 0.4);
@@ -640,11 +636,7 @@
       font-style: italic;
     }
 
-    /* 
-      ====================================================
-      修改：簡潔化目錄清單 (僅保留 Chapter 標號與作品標題)
-      ====================================================
-    */
+    /* 簡潔化目錄清單 */
     .works-grid {
       display: flex;
       flex-direction: column;
@@ -656,7 +648,7 @@
       width: 100%;
       background: transparent;
       border: none;
-      padding: 30px 20px; /* 縮小間距使排版更緊湊 */
+      padding: 30px 20px;
       cursor: pointer;
       text-align: center;
       position: relative;
@@ -693,7 +685,7 @@
       color: var(--ink-primary);
     }
 
-    /* 內文閱讀視圖 (維持原本的樣式配置) */
+    /* 內文閱讀視圖 */
     .manuscript-reader {
       display: none;
       animation: fadeInReader 0.6s ease;
@@ -701,7 +693,6 @@
     }
     .manuscript-reader.active {
       display: block;
-      /* 閱讀內文時，底板稍微加深以保證易讀性 */
       background: rgba(252, 249, 245, 0.85); 
     }
     .reader-top-bar {
@@ -754,40 +745,31 @@
       color: var(--gold-dark);
     }
     
-.reader-content {
-  /* 前面的設定保持不變 */
-  font-size: 16px;
-  line-height: 42px; 
-  color: var(--ink-primary);
-  text-align: justify;
-  white-space: pre-line;
-  padding: 0 20px;
-  
-  background-image: linear-gradient(
-    to bottom,
-    transparent 41px, 
-    rgba(197, 160, 89, 0.35) 41px,
-    rgba(197, 160, 89, 0.35) 42px
-  );
-  background-size: 100% 42px; 
-  
-  /* 
-    請修改這一行！ 
-    先從 0 0 開始，如果線還是太高，可以改成 0 2px 或 0 4px 慢慢把線往下推。
-    如果是太低（離文字太遠），可以改成 0 -2px 往上拉。
-  */
-  background-position: 0 0; 
-}
-.reader-content::first-letter {
-  font-size: 42px;
-  color: var(--gold-dark);
-  font-weight: 700;
-  margin-right: 4px;
-  
-  /* 關鍵修復：強制首字行高為 1，不讓它繼承原本 2.6 的大行高 */
-  line-height: 1; 
-  vertical-align: -10%; /* 微調下沉感，讓大字與旁邊的文字對齊得更好 */
-}
+    .reader-content {
+      font-size: 16px;
+      line-height: 42px; 
+      color: var(--ink-primary);
+      text-align: justify;
+      white-space: pre-line;
+      padding: 0 20px;
+      
+      background-image: linear-gradient(
+        to bottom,
+        transparent 41px, 
+        rgba(197, 160, 89, 0.35) 41px,
+        rgba(197, 160, 89, 0.35) 42px
+      );
+      background-size: 100% 42px; 
+      background-position: 0 0; 
+    }
+    .reader-content::first-letter {
+      font-size: 42px;
+      color: var(--gold-dark);
+      font-weight: 700;
+      margin-right: 4px;
+      line-height: 1; 
+      vertical-align: -10%;
+    }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-6px); }
@@ -806,13 +788,20 @@
       .characters-stage {
         overflow-x: auto;
         justify-content: flex-start;
-        padding: 20px 10px;
+        padding: 20px 0; /* 移除左右 padding，交給首尾卡片的 margin 負責空間撐開 */
         scroll-snap-type: x mandatory;
       }
       .char-card {
         flex: 0 0 205px;
         height: 480px;
         scroll-snap-align: center;
+      }
+      /* 關鍵修正：確保第一個和最後一個卡片能夠在手機版滑動至正中間 */
+      .char-card:first-child {
+        margin-left: calc(50% - 102.5px);
+      }
+      .char-card:last-child {
+        margin-right: calc(50% - 102.5px);
       }
       .modal-header-area {
         padding-top: 30px;
@@ -1128,6 +1117,19 @@
       });
     }
 
+    /* 新增：手機版隨機選取一位角色置中顯示 */
+    function scrollToRandomCharacter() {
+      if (window.innerWidth <= 860) {
+        const cards = document.querySelectorAll('.char-card');
+        if (cards.length > 0) {
+          const randomIndex = Math.floor(Math.random() * cards.length);
+          setTimeout(() => {
+            cards[randomIndex].scrollIntoView({ behavior: 'auto', inline: 'center' });
+          }, 50);
+        }
+      }
+    }
+
     function openPortfolio(id) {
       currentStudentId = id;
       currentGenre = 'poetry';
@@ -1162,7 +1164,6 @@
         return;
       }
 
-      // 【核心修改】只輸出 Chapter 序號與作品標題，不顯示內文預覽
       worksGrid.innerHTML = works.map((w, idx) => {
         const chNum = ROMAN_NUMERALS[idx] || (idx + 1);
         return `
@@ -1282,6 +1283,9 @@
 
     renderMainStage();
     detectImageAccess();
+    
+    // 初始化完成後，呼叫隨機定位
+    scrollToRandomCharacter();
   </script>
 </body>
 </html>
