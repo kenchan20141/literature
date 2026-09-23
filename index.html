@@ -180,7 +180,8 @@
       left: 0;
       width: 100%;
       height: 84%;
-      background-image: url('./文學人.jpg');
+      /* 已替換為 Google Drive 直連圖片網址 */
+      background-image: url('https://lh3.googleusercontent.com/d/1pPd61CjmQpCXUKLwPoKLV6EXoZia8e60');
       background-repeat: no-repeat;
       background-size: 615% auto;
       background-position-y: 50% !important;
@@ -733,13 +734,13 @@
         roman: "VI",
         name: "", // 請填寫姓名（例如："潯"）
         tag: "",  // 請填寫簡介（例如："東方幽玄 &bull; 寂靜意境"）
-       works: {
-      // 1. 詩歌分類
-      poetry: [
-        {
-          title: "鳳攸東街",
-   
-          content: `
+        works: {
+          // 1. 詩歌分類
+          poetry: [
+            {
+              title: "鳳攸東街",
+              tagline: "",
+              content: `
 
 高大的榕樹
 屹立在筆直街道
@@ -802,8 +803,8 @@
 途人的額頭
 如同正偷偷數著
 自己在鳳攸東街生活的日子`
-        }
-      ],
+            }
+          ],
           novel: [],
           prose: []
         }
@@ -957,7 +958,7 @@
     });
 
     /* ========================================================
-       金粉粒子 Canvas (無 EMOJI，純古典微粒光影)
+       金粉粒子 Canvas (純古典微粒光影)
        ======================================================== */
     const canvas = document.getElementById('goldDustCanvas');
     const ctx = canvas.getContext('2d');
