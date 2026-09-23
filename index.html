@@ -754,14 +754,30 @@
       color: var(--gold-dark);
     }
     
-    .reader-content {
-      font-size: 16px;
-      line-height: 2.6;
-      color: var(--ink-primary);
-      text-align: justify;
-      white-space: pre-line;
-      padding: 0 20px;
-    }
+.reader-content {
+  /* 前面的設定保持不變 */
+  font-size: 16px;
+  line-height: 42px; 
+  color: var(--ink-primary);
+  text-align: justify;
+  white-space: pre-line;
+  padding: 0 20px;
+  
+  background-image: linear-gradient(
+    to bottom,
+    transparent 41px, 
+    rgba(197, 160, 89, 0.35) 41px,
+    rgba(197, 160, 89, 0.35) 42px
+  );
+  background-size: 100% 42px; 
+  
+  /* 
+    請修改這一行！ 
+    先從 0 0 開始，如果線還是太高，可以改成 0 2px 或 0 4px 慢慢把線往下推。
+    如果是太低（離文字太遠），可以改成 0 -2px 往上拉。
+  */
+  background-position: 0 0; 
+}
 .reader-content::first-letter {
   font-size: 42px;
   color: var(--gold-dark);
