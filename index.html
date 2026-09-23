@@ -82,7 +82,7 @@
       border: 1px solid rgba(197, 160, 89, 0.2);
     }
 
-    /* 四角復古花飾 (純向量 SVG) */
+    /* 四角復古花飾 */
     .corner-flourish {
       position: absolute;
       width: 64px;
@@ -96,6 +96,71 @@
     .bottom-left { bottom: -2px; left: -2px; transform: scaleY(-1); }
     .bottom-right { bottom: -2px; right: -2px; transform: scale(-1); }
 
+    /* ========================================================
+       未登入學校帳號時的古典提醒橫幅 (Banner)
+       ======================================================== */
+    .auth-banner {
+      display: none; /* 預設不顯示，圖片載入失敗時經 JS 開啟 */
+      position: relative;
+      z-index: 20;
+      background: rgba(245, 239, 235, 0.95);
+      border: 1px solid var(--gold-primary);
+      box-shadow: 0 4px 20px rgba(140, 109, 55, 0.15);
+      padding: 10px 24px;
+      margin: 14px auto 0;
+      max-width: 900px;
+      border-radius: 3px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      animation: fadeIn 0.6s ease;
+    }
+    .auth-banner.visible {
+      display: flex;
+    }
+    .auth-banner-text {
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      color: var(--ink-light);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .auth-banner-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-school-auth {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      font-size: 12px;
+      letter-spacing: 0.15em;
+      color: #fff;
+      background: var(--gold-dark);
+      border: 1px solid var(--gold-primary);
+      border-radius: 2px;
+      cursor: pointer;
+      text-decoration: none;
+      font-family: inherit;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+    .btn-school-auth:hover {
+      background: var(--gold-primary);
+      box-shadow: 0 2px 8px rgba(197, 160, 89, 0.4);
+    }
+    .banner-close-btn {
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      color: var(--ink-faint);
+      cursor: pointer;
+      padding: 0 4px;
+    }
+
     /* 主舞台版面 */
     .viewport-container {
       position: relative;
@@ -104,12 +169,12 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 30px 24px 20px;
+      padding: 24px 24px 20px;
     }
 
     header {
       text-align: center;
-      margin-top: 10px;
+      margin-top: 6px;
     }
     .main-title {
       font-family: 'Cinzel', serif;
@@ -127,7 +192,7 @@
       margin-top: 4px;
     }
 
-    /* 角色展示廊 (Hero Stage) */
+    /* 角色展示廊 */
     .characters-stage {
       flex: 1;
       display: flex;
@@ -140,13 +205,13 @@
       width: 100%;
     }
 
-    /* 角色卡片 (全身無裁切黃金比例) */
+    /* 角色卡片 */
     .char-card {
       position: relative;
       flex: 1;
       max-width: 215px;
       height: clamp(480px, 72vh, 620px);
-      background: linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(235,223,205,0.45) 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(235,223,205,0.5) 100%);
       border: 1px solid var(--border-gold);
       border-radius: 4px;
       cursor: pointer;
@@ -165,6 +230,7 @@
       border: 1px solid rgba(197, 160, 89, 0.2);
       border-radius: 2px;
       pointer-events: none;
+      z-index: 3;
     }
 
     .char-card:hover {
@@ -173,23 +239,23 @@
       box-shadow: 0 16px 36px rgba(140, 109, 55, 0.2), 0 0 16px rgba(232, 211, 158, 0.4);
     }
 
-    /* 角色影像：垂直錨點固定居中 50%，完整顯示全身 */
+    /* 角色影像 */
     .char-visual {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 84%;
-      /* 已替換為 Google Drive 直連圖片網址 */
       background-image: url('https://lh3.googleusercontent.com/d/1pPd61CjmQpCXUKLwPoKLV6EXoZia8e60');
       background-repeat: no-repeat;
       background-size: 615% auto;
       background-position-y: 50% !important;
       transition: transform 0.6s var(--transition-smooth), filter 0.4s;
       filter: sepia(0.08) contrast(1.02);
+      z-index: 1;
     }
 
-    /* 6 位角色精準水平定位 */
+    /* 6 位角色水平定位 */
     .char-card[data-index="0"] .char-visual { background-position-x: 7.5%; }
     .char-card[data-index="1"] .char-visual { background-position-x: 25.5%; }
     .char-card[data-index="2"] .char-visual { background-position-x: 43%; }
@@ -202,17 +268,89 @@
       filter: sepia(0) contrast(1.05);
     }
 
+    /* ========================================================
+       未登入學校帳號時的角色立繪優雅後備層 (Fallback UX)
+       ======================================================== */
+    .card-auth-fallback {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 84%;
+      display: none; /* 預設隱藏，若載入失敗才顯示 */
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 16px;
+      text-align: center;
+      background: radial-gradient(circle at 50% 45%, rgba(255,255,255,0.7) 0%, rgba(235,223,205,0.85) 100%);
+      z-index: 2;
+    }
+
+    body.needs-school-auth .card-auth-fallback {
+      display: flex;
+    }
+    body.needs-school-auth .char-visual {
+      display: none; /* 隱藏空白破圖 */
+    }
+
+    .fallback-seal {
+      width: 48px;
+      height: 48px;
+      border: 1px dashed var(--gold-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      color: var(--gold-dark);
+      background: rgba(255, 255, 255, 0.4);
+    }
+    .fallback-title {
+      font-size: 13px;
+      letter-spacing: 0.15em;
+      font-weight: 600;
+      color: var(--gold-dark);
+      margin-bottom: 4px;
+    }
+    .fallback-desc {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--ink-faint);
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+    .btn-card-login {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid var(--gold-primary);
+      color: var(--ink-primary);
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      padding: 6px 12px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.3s;
+    }
+    .btn-card-login:hover {
+      background: var(--gold-dark);
+      color: #fff;
+      border-color: var(--gold-dark);
+      transform: translateY(-2px);
+    }
+
     .char-gradient-scrim {
       position: absolute;
       inset: 0;
       background: linear-gradient(to top, rgba(238, 226, 209, 0.96) 16%, rgba(238, 226, 209, 0.2) 36%, transparent 60%);
       pointer-events: none;
+      z-index: 2;
     }
 
     /* 角色底部文字資訊 */
     .char-meta {
       position: relative;
-      z-index: 2;
+      z-index: 4;
       text-align: center;
     }
     .char-numeral {
@@ -262,7 +400,7 @@
     }
 
     /* ========================================================
-       個人作品集 手稿視窗 (唯讀閱覽模式)
+       個人作品集 手稿視窗
        ======================================================== */
     .portfolio-overlay {
       position: fixed;
@@ -313,7 +451,6 @@
       z-index: 5;
     }
 
-    /* 手稿頂部資訊列 */
     .book-header {
       padding: 24px 36px 16px;
       display: flex;
@@ -362,7 +499,6 @@
       transform: rotate(90deg);
     }
 
-    /* 體裁導航：詩歌 / 小說 / 散文 */
     .genre-nav {
       display: flex;
       padding: 0 36px;
@@ -390,7 +526,6 @@
       font-weight: 600;
     }
 
-    /* 作品陳列主體 */
     .book-body {
       flex: 1;
       padding: 30px 36px;
@@ -400,7 +535,6 @@
       position: relative;
     }
 
-    /* 空作品狀態 */
     .empty-state {
       display: flex;
       flex-direction: column;
@@ -482,7 +616,6 @@
       overflow: hidden;
     }
 
-    /* 單篇手稿全覽視圖 */
     .manuscript-reader {
       display: none;
       animation: fadeIn 0.4s ease;
@@ -541,12 +674,15 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
+      from { opacity: 0; transform: translateY(-6px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* 響應式優化 */
     @media (max-width: 860px) {
+      .auth-banner {
+        flex-direction: column;
+        text-align: center;
+      }
       .characters-stage {
         overflow-x: auto;
         justify-content: flex-start;
@@ -601,6 +737,22 @@
       <h1 class="main-title">Archivum Litterarum</h1>
       <p class="sub-title">文 學 人 典 藏 冊</p>
     </header>
+
+    <!-- 頂部權限提示橫幅 (當非學校帳號、圖片無法讀取時自動展開) -->
+    <aside class="auth-banner" id="authBanner" aria-live="polite">
+      <div class="auth-banner-text">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold-dark)" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>典藏立繪受校園權限保護；若角色未顯示，請切換至學校 Google 電郵。</span>
+      </div>
+      <div class="auth-banner-actions">
+        <button class="btn-school-auth" onclick="switchSchoolAccount()">切換學校電郵登入</button>
+        <button class="banner-close-btn" onclick="dismissBanner()" title="關閉提示">&times;</button>
+      </div>
+    </aside>
 
     <!-- 6 位學生角色主舞台 -->
     <main class="characters-stage" id="charactersStage"></main>
@@ -661,81 +813,81 @@
 
   <script>
     /* ==========================================================================
+       【Google 雲端身分授權設定】
+       ========================================================================== */
+    const GOOGLE_DRIVE_FILE_ID = "1pPd61CjmQpCXUKLwPoKLV6EXoZia8e60";
+    const DIRECT_IMG_URL = `https://lh3.googleusercontent.com/d/${GOOGLE_DRIVE_FILE_ID}`;
+    
+    // 點擊後開啟 Google Account Chooser，引導切換至學校帳號
+    function switchSchoolAccount() {
+      const authUrl = `https://accounts.google.com/AccountChooser?continue=https://drive.google.com/file/d/${GOOGLE_DRIVE_FILE_ID}/view`;
+      window.open(authUrl, '_blank', 'noopener,noreferrer');
+    }
+
+    function dismissBanner() {
+      document.getElementById('authBanner').classList.remove('visible');
+    }
+
+    // 檢測圖片是否因權限問題無法載入
+    function detectImageAccess() {
+      const probe = new Image();
+      probe.onload = () => {
+        // 成功載入，保持原始狀態
+        document.body.classList.remove('needs-school-auth');
+      };
+      probe.onerror = () => {
+        // 載入失敗（非學校網域或未登入）：啟動優雅降級介面
+        document.body.classList.add('needs-school-auth');
+        document.getElementById('authBanner').classList.add('visible');
+      };
+      probe.src = DIRECT_IMG_URL;
+    }
+
+    /* ==========================================================================
        【學生資料與作品典藏設定區】
-       您只需直接在下方代碼中修訂 6 位學生的姓名 (name)、簡介 (tag)，
-       以及其各自在 poetry（詩歌）、novel（小說）、prose（散文）中的篇目即可。
-       
-       作品篇目格式範例：
-       {
-         title: "篇名",
-         tagline: "題註或風格",
-         content: "正文內容...\n支援使用換行符號..."
-       }
-       若陣列為空 []，前台會自動呈現典雅的留白狀態。
        ========================================================================== */
     const STUDENTS_DATA = [
       {
         id: 0,
         roman: "I",
-        name: "", // 請填寫姓名（例如："艾莉西亞"）
-        tag: "",  // 請填寫簡介（例如："古典聖詠 &bull; 典雅主義"）
-        works: {
-          poetry: [],
-          novel: [],
-          prose: []
-        }
+        name: "",
+        tag: "",
+        works: { poetry: [], novel: [], prose: [] }
       },
       {
         id: 1,
         roman: "II",
-        name: "", // 請填寫姓名（例如："林默"）
-        tag: "",  // 請填寫簡介（例如："理性思潮 &bull; 內省寫實"）
-        works: {
-          poetry: [],
-          novel: [],
-          prose: []
-        }
+        name: "",
+        tag: "",
+        works: { poetry: [], novel: [], prose: [] }
       },
       {
         id: 2,
         roman: "III",
-        name: "", // 請填寫姓名（例如："高橋律"）
-        tag: "",  // 請填寫簡介（例如："感官意識 &bull; 青春流徙"）
-        works: {
-          poetry: [],
-          novel: [],
-          prose: []
-        }
+        name: "",
+        tag: "",
+        works: { poetry: [], novel: [], prose: [] }
       },
       {
         id: 3,
         roman: "IV",
-        name: "", // 請填寫姓名（例如："桑亞"）
-        tag: "",  // 請填寫簡介（例如："自然母體 &bull; 鄉土靈性"）
-        works: {
-          poetry: [],
-          novel: [],
-          prose: []
-        }
+        name: "",
+        tag: "",
+        works: { poetry: [], novel: [], prose: [] }
       },
       {
         id: 4,
         roman: "V",
-        name: "", // 請填寫姓名（例如："艾爾莎"）
-        tag: "",  // 請填寫簡介（例如："英雄史詩 &bull; 悲劇詠嘆"）
-        works: {
-          poetry: [],
-          novel: [],
-          prose: []
-        }
+        name: "",
+        tag: "",
+        works: { poetry: [], novel: [], prose: [] }
       },
       {
         id: 5,
         roman: "VI",
-        name: "", // 請填寫姓名（例如："潯"）
-        tag: "",  // 請填寫簡介（例如："東方幽玄 &bull; 寂靜意境"）
+        name: "",
+        tag: "",
         works: {
-          // 1. 詩歌分類
           poetry: [
             {
               title: "鳳攸東街",
@@ -812,7 +964,7 @@
     ];
 
     /* ========================================================
-       唯讀視圖渲染邏輯 (不可在網頁端增修)
+       唯讀視圖渲染邏輯
        ======================================================== */
     const charactersStage = document.getElementById('charactersStage');
     const portfolioOverlay = document.getElementById('portfolioOverlay');
@@ -840,7 +992,24 @@
 
         return `
           <div class="char-card" data-index="${st.id}" role="button" aria-label="檢視學生 ${st.roman} 的典藏冊">
+            <!-- 正常立繪層 -->
             <div class="char-visual"></div>
+
+            <!-- 權限不足時的古典後備畫面 -->
+            <div class="card-auth-fallback">
+              <div class="fallback-seal">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+              </div>
+              <div class="fallback-title">校園限定立繪</div>
+              <p class="fallback-desc">此畫像存於校內雲端<br>需使用學校電郵檢視</p>
+              <button class="btn-card-login" onclick="event.stopPropagation(); switchSchoolAccount();">
+                登入學校帳號
+              </button>
+            </div>
+
             <div class="char-gradient-scrim"></div>
             <div class="char-meta">
               <span class="char-numeral">${st.roman}</span>
@@ -904,7 +1073,6 @@
         `;
       }).join('');
 
-      // 點擊篇目進入全文閱讀
       document.querySelectorAll('.work-item').forEach(item => {
         item.addEventListener('click', () => {
           const idx = parseInt(item.getAttribute('data-work-idx'), 10);
@@ -933,7 +1101,6 @@
       setTimeout(showWorksList, 400);
     }
 
-    // 分類切換
     genreTabs.forEach(tab => {
       tab.addEventListener('click', () => {
         genreTabs.forEach(t => t.classList.remove('active'));
@@ -958,7 +1125,7 @@
     });
 
     /* ========================================================
-       金粉粒子 Canvas (純古典微粒光影)
+       金粉粒子 Canvas
        ======================================================== */
     const canvas = document.getElementById('goldDustCanvas');
     const ctx = canvas.getContext('2d');
@@ -1017,8 +1184,9 @@
     }
     animateParticles();
 
-    // 初始化展示
+    // 啟動主流程
     renderMainStage();
+    detectImageAccess();
   </script>
 </body>
 </html>
