@@ -915,7 +915,18 @@
       </div>
     </aside>
 
-    <main class="characters-stage" id="charactersStage"></main>
+    <!-- 密碼輸入區段 (驗證成功前顯示) -->
+    <section id="pwd-section" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; animation: fadeIn 0.8s ease;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <h3 style="font-family: 'Noto Serif TC', serif; font-size: 20px; letter-spacing: 0.4em; text-indent: 0.4em; color: var(--ink-primary); font-weight: 600; margin-bottom: 12px;">請輸入閱覽密語</h3>
+        <p style="font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 0.3em; color: var(--gold-dark);">AUTHORIZATION</p>
+      </div>
+      <input type="password" id="pwd-input" placeholder="· · ·" autofocus autocomplete="off" spellcheck="false"
+             style="background: transparent; border: none; border-bottom: 1px solid var(--gold-primary); color: var(--ink-primary); font-size: 36px; text-align: center; outline: none; width: 320px; font-family: 'Cinzel', serif; letter-spacing: 0.3em; padding-bottom: 12px; border-radius: 0; transition: border-color 0.3s; box-shadow: none;">
+    </section>
+
+    <!-- 角色展示廊 (驗證成功後顯示) -->
+    <main class="characters-stage" id="charactersStage" style="display: none;"></main>
 
     <footer>
       <p class="enter-cue">&mdash; 點 擊 卷 冊 閱 讀 創 作 &mdash;</p>
@@ -986,6 +997,37 @@
   </div>
 
   <script>
+    // --- 密碼解鎖與 LocalStorage 邏輯 ---
+    document.getElementById('pwd-input').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        try {
+          if (btoa(this.value) === 'aWxvdmVjaGlsaXQ=') {
+            // 寫入 LocalStorage，記住驗證狀態
+            localStorage.setItem('archivum_auth', 'true');
+            
+            const pwdSec = document.getElementById('pwd-section');
+            const charStage = document.getElementById('charactersStage');
+            
+            pwdSec.style.transition = 'opacity 0.6s ease';
+            pwdSec.style.opacity = '0';
+            
+            setTimeout(() => {
+              pwdSec.style.display = 'none';
+              charStage.style.display = '';
+              charStage.style.animation = 'fadeIn 0.8s ease';
+              scrollToRandomCharacter();
+            }, 600);
+          } else {
+            throw new Error();
+          }
+        } catch (err) {
+          this.value = '';
+          this.placeholder = '× × ×';
+          setTimeout(() => this.placeholder = '· · ·', 1000);
+        }
+      }
+    });
+
     const GOOGLE_DRIVE_FILE_ID = "1pPd61CjmQpCXUKLwPoKLV6EXoZia8e60";
     const DIRECT_IMG_URL = `https://lh3.googleusercontent.com/d/${GOOGLE_DRIVE_FILE_ID}`;
     
@@ -1051,7 +1093,7 @@
 噠噠 噠噠
 有人快步走近
 白色西裝 黑色皮鞋
-公文包裡的手機震了一下
+公文包裡 configurações的手機震了一下
 他沒有停下
 有幾顆榕樹果實
 啪嗒 啪嗒
@@ -1315,11 +1357,28 @@
       });
       requestAnimationFrame(animateParticles);
     }
-    animateParticles();
 
-    renderMainStage();
-    detectImageAccess();
-    scrollToRandomCharacter();
+    // 初始化與驗證檢查
+    function init() {
+      renderMainStage();
+      detectImageAccess();
+      animateParticles();
+
+      // 檢查 LocalStorage 是否已經有通過驗證的記錄
+      if (localStorage.getItem('archivum_auth') === 'true') {
+        const pwdSec = document.getElementById('pwd-section');
+        const charStage = document.getElementById('charactersStage');
+        pwdSec.style.display = 'none';
+        charStage.style.display = '';
+        
+        // 延遲一點點時間等待 DOM 渲染完成後再捲動
+        setTimeout(scrollToRandomCharacter, 100);
+      }
+    }
+
+    // 啟動
+    init();
+
   </script>
 </body>
 </html>
