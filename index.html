@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>文學人典藏錄 &bull; Archivum Litterarum</title>
+  <title>文學人作品集 &bull; Archivum Litterarum</title>
   
   <!-- 字型加載：古典羅馬字體 Cinzel、古典襯線 Cormorant 與 思源宋體 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -169,37 +169,73 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 24px 24px 20px;
+      padding: 30px 24px 20px;
     }
 
-    header {
+    /* ========================================================
+       Hero Header 設計
+       ======================================================== */
+    .hero-header {
       text-align: center;
-      margin-top: 6px;
-    }
-    .main-title {
-      font-family: 'Cinzel', serif;
-      font-size: clamp(20px, 3.2vw, 36px);
-      letter-spacing: 0.3em;
-      color: var(--gold-dark);
-      text-transform: uppercase;
-      font-weight: 700;
-      text-shadow: 0 1px 2px rgba(255,255,255,0.8);
-    }
-    .sub-title {
-      font-size: clamp(12px, 1.2vw, 14px);
-      letter-spacing: 0.45em;
-      color: var(--ink-faint);
-      margin-top: 4px;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    /* 角色展示廊 */
+    .main-title-chinese {
+      font-family: 'Noto Serif TC', serif;
+      font-size: clamp(24px, 3.5vw, 42px);
+      letter-spacing: 0.35em;
+      text-indent: 0.35em;
+      color: var(--ink-primary);
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .title-highlight {
+      color: var(--gold-dark);
+    }
+
+    .sub-title-latin {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(11px, 1.2vw, 13px);
+      letter-spacing: 0.5em;
+      color: var(--ink-faint);
+      margin-bottom: 16px;
+    }
+
+    .header-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      width: 100%;
+      max-width: 400px;
+    }
+    .header-divider .line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-gold), transparent);
+    }
+    .header-divider .diamond {
+      color: var(--gold-primary);
+      font-size: 10px;
+    }
+
+    /* ========================================================
+       角色展示廊
+       ======================================================== */
     .characters-stage {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: clamp(10px, 1.8vw, 22px);
-      padding: 16px 0;
+      padding: 24px 0 16px;
       max-width: 1440px;
       margin: 0 auto;
       width: 100%;
@@ -210,7 +246,7 @@
       position: relative;
       flex: 1;
       max-width: 215px;
-      height: clamp(480px, 72vh, 620px);
+      height: clamp(400px, 60vh, 560px);
       background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(235,223,205,0.5) 100%);
       border: 1px solid var(--border-gold);
       border-radius: 4px;
@@ -268,9 +304,7 @@
       filter: sepia(0) contrast(1.05);
     }
 
-    /* ========================================================
-       未登入學校帳號時的角色立繪優雅後備層 (Fallback UX)
-       ======================================================== */
+    /* 未登入學校帳號時的角色立繪優雅後備層 */
     .card-auth-fallback {
       position: absolute;
       top: 0;
@@ -436,7 +470,6 @@
       transform: scale(1) translateY(0);
     }
 
-    /* 專屬角色半透明背景層 */
     .modal-char-bg-container {
       position: absolute;
       inset: 0;
@@ -459,7 +492,6 @@
       transition: background-position 0s;
     }
 
-    /* 視窗內容層 */
     .modal-content-wrapper {
       position: relative;
       z-index: 1;
@@ -502,7 +534,6 @@
       transform: rotate(90deg);
     }
 
-    /* 標題與分類區 */
     .modal-header-area {
       background: linear-gradient(to bottom, rgba(245, 239, 235, 1) 0%, rgba(245, 239, 235, 0.95) 60%, rgba(245, 239, 235, 0) 100%);
       padding-top: 50px;
@@ -601,7 +632,6 @@
       position: relative;
     }
 
-    /* 閱讀面板底板 (Content Plate) - 磨砂玻璃效果 */
     .content-plate {
       background: rgba(252, 249, 245, 0.65);
       backdrop-filter: blur(16px);
@@ -636,7 +666,6 @@
       font-style: italic;
     }
 
-    /* 簡潔化目錄清單 */
     .works-grid {
       display: flex;
       flex-direction: column;
@@ -685,7 +714,6 @@
       color: var(--ink-primary);
     }
 
-    /* 內文閱讀視圖 */
     .manuscript-reader {
       display: none;
       animation: fadeInReader 0.6s ease;
@@ -785,18 +813,20 @@
         flex-direction: column;
         text-align: center;
       }
+      .main-title-chinese {
+        font-size: 26px;
+      }
       .characters-stage {
         overflow-x: auto;
         justify-content: flex-start;
-        padding: 20px 0; /* 移除左右 padding，交給首尾卡片的 margin 負責空間撐開 */
+        padding: 20px 0;
         scroll-snap-type: x mandatory;
       }
       .char-card {
         flex: 0 0 205px;
-        height: 480px;
+        height: 440px;
         scroll-snap-align: center;
       }
-      /* 關鍵修正：確保第一個和最後一個卡片能夠在手機版滑動至正中間 */
       .char-card:first-child {
         margin-left: calc(50% - 102.5px);
       }
@@ -858,9 +888,16 @@
   </div>
 
   <div class="viewport-container">
-    <header>
-      <h1 class="main-title">Archivum Litterarum</h1>
-      <p class="sub-title">文 學 人 典 藏 冊</p>
+    
+    <header class="hero-header">
+      <h1 class="main-title-chinese"><span class="title-highlight">文學人</span> 作品集</h1>
+      <h2 class="sub-title-latin">ARCHIVUM LITTERARUM</h2>
+      
+      <div class="header-divider">
+        <span class="line"></span>
+        <span class="diamond">♦</span>
+        <span class="line"></span>
+      </div>
     </header>
 
     <aside class="auth-banner" id="authBanner" aria-live="polite">
@@ -870,7 +907,7 @@
           <line x1="12" y1="8" x2="12" y2="12"></line>
           <line x1="12" y1="16" x2="12.01" y2="16"></line>
         </svg>
-        <span>典藏立繪受校園權限保護；若角色未顯示，請切換至學校 Google 電郵。</span>
+        <span>作品集立繪受校園權限保護；若角色未顯示，請切換至學校 Google 電郵。</span>
       </div>
       <div class="auth-banner-actions">
         <button class="btn-school-auth" onclick="switchSchoolAccount()">切換學校電郵登入</button>
@@ -1081,10 +1118,10 @@
       charactersStage.innerHTML = STUDENTS_DATA.map((st) => {
         const hasName = st.name.trim().length > 0;
         const displayName = hasName ? st.name : `學生 ${st.roman}`;
-        const displayTag = st.tag.trim().length > 0 ? st.tag : '典藏研習生';
+        const displayTag = st.tag.trim().length > 0 ? st.tag : '文學研習生';
 
         return `
-          <div class="char-card" data-index="${st.id}" role="button" aria-label="檢視學生 ${st.roman} 的典藏冊">
+          <div class="char-card" data-index="${st.id}" role="button" aria-label="檢視學生 ${st.roman} 的作品集">
             <div class="char-visual"></div>
             <div class="card-auth-fallback">
               <div class="fallback-seal">
@@ -1117,7 +1154,6 @@
       });
     }
 
-    /* 新增：手機版隨機選取一位角色置中顯示 */
     function scrollToRandomCharacter() {
       if (window.innerWidth <= 860) {
         const cards = document.querySelectorAll('.char-card');
@@ -1137,7 +1173,7 @@
       
       const hasName = student.name.trim().length > 0;
       modalAuthorName.textContent = hasName ? student.name : `學生 ${student.roman}`;
-      modalAuthorGenre.innerHTML = student.tag.trim().length > 0 ? student.tag : '典藏研習生';
+      modalAuthorGenre.innerHTML = student.tag.trim().length > 0 ? student.tag : '文學研習生';
 
       modalCharBg.style.backgroundPositionX = CHAR_BG_POSITIONS[id] || '50%';
 
@@ -1283,8 +1319,6 @@
 
     renderMainStage();
     detectImageAccess();
-    
-    // 初始化完成後，呼叫隨機定位
     scrollToRandomCharacter();
   </script>
 </body>
